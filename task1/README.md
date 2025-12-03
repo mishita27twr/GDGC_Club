@@ -1,3 +1,7 @@
+# GDSC Galaxy(deployed )
+
+Live Demo: [https://gdgc-club-galaxy.vercel.app](https://gdgc-club-galaxy.vercel.app)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
