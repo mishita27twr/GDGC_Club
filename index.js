@@ -11,16 +11,18 @@ let members = [{ name: "Anubhavi Jaiswal", reg: "23BXXXXXXX", designation: "GDSC
   { name: "Akshay Kumar Mishra", reg: "23BXXXXXXX", designation: "GDSC Tech Team", position: "Lead", skills: "Figma, Photoshop", bio: "UI/UX designer", image: "" },
   { name: "Gagan Bhardwaj", reg: "24BXXXXXXX", designation: "GDSC Tech Team", position: "Co-Lead", skills: "Figma, Photoshop", bio: "UI/UX designer", image: "" }];
 
-// GET members
+// GET all members
 app.get("/members", (req, res) => res.json(members));
 
-// POST members
+// POST add a member
 app.post("/members", (req, res) => {
   const { name, reg, designation, skills, bio } = req.body;
-  if (!name || !reg || !designation) return res.status(400).json({ error: "Missing required fields" });
+  if (!name || !reg || !designation) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
   const newMember = { name, reg, designation, skills, bio };
   members.push(newMember);
-  res.json(members);
+  res.json(members); // return updated list
 });
 
 // DELETE member by index
