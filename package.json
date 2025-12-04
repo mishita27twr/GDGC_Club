@@ -1,0 +1,25 @@
+{
+  "name": "gdgc_club",
+  "version": "1.0.0",
+  "description": "Live Demo: [https://gdgc-club-galaxy.vercel.app](https://gdgc-club-galaxy.vercel.app)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mishita27twr/GDGC_Club.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mishita27twr/GDGC_Club/issues"
+  },
+  "homepage": "https://github.com/mishita27twr/GDGC_Club#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1"
+  }
+}
