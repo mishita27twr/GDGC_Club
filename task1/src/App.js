@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 
 /*********** COLORS ***********/
 const COLORS = ["#EA4335", "#FBBC05", "#34A853", "#4285F4"];
+const BACKEND_URL = "https://task2-backend-spui.onrender.com"; // deployed backend
+const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
 /*********** GALAXY BACKGROUND ***********/
 const GalaxyBackground = ({ darkMode }) => {
@@ -146,8 +148,6 @@ const SplashScreen = ({ onFinish, darkMode }) => {
 
 /*********** MAIN APP ***********/
 export default function App() {
-  const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
   const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -165,7 +165,17 @@ export default function App() {
   const [roleFilter, setRoleFilter] = useState("");
   const [skillFilter, setSkillFilter] = useState("");
 
+  // Save dark mode preference
   useEffect(() => localStorage.setItem("darkMode", darkMode), [darkMode]);
+
+  // Fetch members from backend on load
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/members`)
+      .then(res => res.json())
+      .then(data => setMembers(data))
+      .catch(err => console.error("Failed to fetch members:", err));
+  }, []);
+
   const handleSplashFinish = () => setShowSplash(false);
 
   const handleFileUpload = (e) => {
@@ -175,15 +185,69 @@ export default function App() {
     reader.onloadend = () => setProfileImage(reader.result);
     reader.readAsDataURL(file);
   };
+// Add member via backend
+const BACKEND_URL = "https://task2-backend-spui.onrender.com"; // your deployed backend
 
-  const addMember = () => {
-    if (!name || !reg || !designation || !position) { alert("Please fill all fields"); return; }
-    setMembers(prev => [...prev, { name, reg, designation, position, skills, bio, image: profileImage || defaultAvatar }]);
-    setName(""); setReg(""); setDesignation(""); setPosition("Core Member"); setSkills(""); setBio(""); setProfileImage(null); setOpen(false);
+// Fetch members on page load
+useEffect(() => {
+  fetch(`${BACKEND_URL}/members`)
+    .then(res => res.json())
+    .then(data => setMembers(data))
+    .catch(err => console.error("Failed to fetch members:", err));
+}, []);
+
+// Add member via backend
+const addMember = async () => {
+  if (!name || !reg || !designation || !position) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const newMember = {
+    name,
+    reg,
+    designation,
+    position,
+    skills,
+    bio,
+    image: profileImage || defaultAvatar,
   };
 
+  try {
+    // POST the new member
+    const response = await fetch(`${BACKEND_URL}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newMember),
+    });
+
+    if (!response.ok) throw new Error("Failed to add member");
+
+    // Fetch the updated member list
+    const updatedMembers = await fetch(`${BACKEND_URL}/members`).then(res => res.json());
+    setMembers(updatedMembers);
+
+    // Reset form
+    setName("");
+    setReg("");
+    setDesignation("");
+    setPosition("Core Member");
+    setSkills("");
+    setBio("");
+    setProfileImage(null);
+    setOpen(false);
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to add member. Check console for errors.");
+  }
+};
+// Delete member via backend
   const deleteMember = (index) => {
-    setMembers(prev => { const copy = [...prev]; copy.splice(index, 1); return copy; });
+    fetch(`${BACKEND_URL}/members/${index}`, { method: "DELETE" })
+      .then(res => res.json())
+      .then(data => setMembers(data))
+      .catch(err => console.error("Failed to delete member:", err));
   };
 
   const allSkills = Array.from(new Set(members.flatMap(m => m.skills?.split(",").map(s => s.trim()) || [])));
@@ -273,15 +337,15 @@ export default function App() {
             <p style={{ margin: "4px 0" }}>{m.designation}</p>
             <p style={{ margin: "4px 0", fontStyle: "italic" }}>{m.position}</p>
             <p style={{ margin: "4px 0" }}>Skills: {m.skills || "N/A"}</p>
-            <p style={{ margin: "4px 0", fontStyle: "italic" }}>{m.bio}</p>
+            <p style={{ margin: "4px 0", fontStyle: "italic", fontSize: 13 }}>{m.bio || ""}</p>
           </div>
         ))}
       </div>
 
       {/* Add Member Modal */}
       {open && (
-        <div style={{ position: "fixed", inset: 0, display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999, backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div style={{ width: 380, padding: 22, borderRadius: 16, backgroundColor: darkMode ? "#0f1113" : "#fff" }}>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "#000000aa", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 5 }}>
+          <div style={{          width: 380, padding: 22, borderRadius: 16, backgroundColor: darkMode ? "#0f1113" : "#fff" }}>
             <h2 style={{ marginTop: 0, textAlign: "center" }}>Add Member</h2>
             <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
             <input placeholder="Registration" value={reg} onChange={e => setReg(e.target.value)} style={inputStyle} />
@@ -312,3 +376,4 @@ export default function App() {
     </div>
   );
 }
+
