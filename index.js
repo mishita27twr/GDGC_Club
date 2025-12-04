@@ -12,17 +12,12 @@ let members = [{ name: "Anubhavi Jaiswal", reg: "23BXXXXXXX", designation: "GDSC
   { name: "Gagan Bhardwaj", reg: "24BXXXXXXX", designation: "GDSC Tech Team", position: "Co-Lead", skills: "Figma, Photoshop", bio: "UI/UX designer", image: "" }];
 
 // GET members
-app.get("/members", (req, res) => {
-  res.json(members);
-});
+app.get("/members", (req, res) => res.json(members));
 
-// POST add member
+// POST members
 app.post("/members", (req, res) => {
   const { name, reg, designation, skills, bio } = req.body;
-  if (!name || !reg || !designation) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
+  if (!name || !reg || !designation) return res.status(400).json({ error: "Missing required fields" });
   const newMember = { name, reg, designation, skills, bio };
   members.push(newMember);
   res.json(members);
@@ -30,8 +25,7 @@ app.post("/members", (req, res) => {
 
 // DELETE member by index
 app.delete("/members/:index", (req, res) => {
-  const { index } = req.params;
-  members.splice(index, 1);
+  members.splice(req.params.index, 1);
   res.json(members);
 });
 
